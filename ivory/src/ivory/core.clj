@@ -1,6 +1,10 @@
-(ns ivory.core)
+(ns ivory.core
+  (:require [org.httpkit.server :as server]))
 
-(defn -main [x]
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn app [req]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "Server is working fine"})
+
+(defn -main []
+  (server/run-server app {:port 8080}))
