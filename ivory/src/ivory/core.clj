@@ -41,12 +41,13 @@
             (POST* "/echo" {body :body-params} (ok body)))
   (POST* "/upload" [file]
          (io/upload-file resource-path file)
-         ;(img (str file))
-         ;(show ((brightness 2.0) img))
-         ;(save img (str "/tmp/" "new-" file) :quality 0.1 :progressive true)
          (response/redirect
-           (str "/files/" (:filename file))))
+           (str "/files/" (:filename file)))
+         )
   (GET* "/files/:filename" [filename]
+        ;(img (str filename))
+        ;(show ((brightness 2.0) img))
+        ;(save img (str "/tmp/" "new-" filename) :quality 0.1 :progressive true)
         (file-response (str resource-path filename)))
   (route/resources "/")
   (route/not-found "<p>404, Page not found.</p>")
