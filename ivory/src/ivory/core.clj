@@ -8,12 +8,16 @@
             [compojure.api.sweet :refer :all]
             ;[compojure.api.upload :refer :all]
             [schema.core :as s]
-            [clojure.java.io :refer :all]
+            [clojure.java.io :refer [resource]]
             [ring.middleware.params :refer :all]
             [ring.middleware.multipart-params :refer :all]
             [noir.io :as io]
             [noir.response :as response]
-            [ring.util.response :refer [file-response]]))
+            [ring.util.response :refer [file-response]])
+  (:use mikera.image.colours)
+  (:use mikera.image.core)
+  (:use mikera.image.filters)
+  (:use mikera.image.spectrum))
 
 (def resource-path "/tmp/")
 
@@ -27,19 +31,24 @@
    :headers {"Content-Type" "text/html"}
    :body    "Server is working fine"})
 
+(defn img [filename]
+  (load-image (str "/tmp/" filename)))
+
 (defapi all-routes
   (GET* "/" [] home-page)
   (context* "/api" []
             (GET* "/user/:id" [id] (ok {:id id}))
             (POST* "/echo" {body :body-params} (ok body)))
   (POST* "/upload" [file]
-        ;; file with same name will be overwrited, so in production mode , gen a
-        ;; random string as filename
-        (io/upload-file resource-path file)
-        (response/redirect
-          (str "/files/" (:filename file))))
+         (io/upload-file resource-path file)
+         (ok file)
+         ;(img (str file))
+         ;(show ((brightness 2.0) img))
+         ;(save img (str "/tmp/" "new-" file) :quality 0.1 :progressive true)
+         ;(response/redirect
+          ; (str "/files/" (:filename file))))
   (GET* "/files/:filename" [filename]
-       (file-response (str resource-path filename)))
+        (file-response (str resource-path filename)))
   (route/resources "/")
   (route/not-found "<p>404, Page not found.</p>")
   )

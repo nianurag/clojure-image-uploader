@@ -7,6 +7,7 @@
                  [http-kit "2.1.18"]
                  [hiccup "1.0.5"]
                  [metosin/compojure-api "0.22.2"]
-                 [lib-noir "0.9.9"]]
+                 [lib-noir "0.9.9"]
+                 [net.mikera/imagez "0.7.0"]]
   :main ivory.core
   )
