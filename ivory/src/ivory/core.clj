@@ -1,12 +1,10 @@
 (ns ivory.core
   (:require [compojure.route :as route :refer [files not-found]]
             [compojure.handler :refer [site]] ; form, query params decode; cookie; session, etc
-            ;[compojure.core :refer [defroutes GET POST DELETE ANY context]]
             [org.httpkit.server :refer [run-server]]
             [hiccup.core :as hiccup :refer [html]]
             [ring.util.http-response :refer [ok]]
             [compojure.api.sweet :refer :all]
-            ;[compojure.api.upload :refer :all]
             [schema.core :as s]
             [clojure.java.io :refer [resource]]
             [ring.middleware.params :refer :all]
@@ -26,13 +24,11 @@
                 [:input {:name "file" :type "file" :size "20"}]
                 [:input {:type "submit" :name "submit" :value "submit"}]]))
 
-(defn status [req]
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    "Server is working fine"})
-
 (defn img [filename]
   (load-image (str "/tmp/" filename)))
+
+(defn uploader [file]
+  (io/upload-file resource-path file))
 
 (defapi all-routes
   (GET* "/" [] home-page)
@@ -40,7 +36,7 @@
             (GET* "/user/:id" [id] (ok {:id id}))
             (POST* "/echo" {body :body-params} (ok body)))
   (POST* "/upload" [file]
-         (io/upload-file resource-path file)
+         (uploader file)
          (response/redirect
            (str "/files/" (:filename file)))
          )
@@ -50,7 +46,7 @@
         ;(save img (str "/tmp/" "new-" filename) :quality 0.1 :progressive true)
         (file-response (str resource-path filename)))
   (route/resources "/")
-  (route/not-found "<p>404, Page not found.</p>")
+  (route/not-found "<p> 404, Page not found.</p>")
   )
 
 (defn -main []
